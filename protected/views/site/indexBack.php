@@ -2,8 +2,6 @@
 /* @var $this SiteController */
 
 $this->pageTitle=Yii::app()->name;
-
-header( 'Location: /index.php?r=category/index', true, 303 );
 ?>
 
 <h1>Welcome to <i><?php echo CHtml::encode(Yii::app()->name); ?></i></h1>
@@ -17,6 +15,6 @@ header( 'Location: /index.php?r=category/index', true, 303 );
 </ul>
 
 <p>For more details on how to further develop this application, please read
-	the <a href="http://www.yiiframework.com/doc/">documentation</a>.
-	Feel free to ask in the <a href="http://www.yiiframework.com/forum/">forum</a>,
-	should you have any questions.</p>
+the <a href="http://www.yiiframework.com/doc/">documentation</a>.
+Feel free to ask in the <a href="http://www.yiiframework.com/forum/">forum</a>,
+should you have any questions.</p>
