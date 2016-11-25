@@ -77,6 +77,7 @@ class CategoryController extends Controller
 	public function actionCreate()
 	{
 		$model=new Category;
+//		$model->parent_id=14;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);

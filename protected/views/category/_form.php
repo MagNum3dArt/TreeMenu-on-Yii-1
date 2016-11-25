@@ -1,9 +1,6 @@
 <div class="form">
 
 <?php
-
-//use app.models.Category;
-
 $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'category-form',
 	'enableAjaxValidation'=>false,
@@ -11,18 +8,11 @@ $form=$this->beginWidget('CActiveForm', array(
 ));
 
 $categories =  Category::model()->findAll();
-$select_parent =[];
-// if default value for parent drop down list not the root value, please add default value before '0'=>'root'
-$first = ['0'=>'root'];
-foreach ($categories as $category) {
-	if (!isset($first[$category->id])){
-		if($category->parent_id==0 || isset($select_parent[$category->parent_id]) || isset($first[$category->parent_id])){
-			$select_parent[$category->id]=$category->title;
-		}
-	}
+$select_parent = ['0'=>'root'];
 
-}
-$select_parent = $first + $select_parent;
+foreach ($categories as $category)
+	$select_parent[$category->id]=$category->title;
+
 ?>
 
 	<p class="note">Fields with <span class="required">*</span> are required.</p>
