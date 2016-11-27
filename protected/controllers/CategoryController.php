@@ -3,6 +3,17 @@
 class CategoryController extends Controller
 {
 	/**
+	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+	 * using two-column layout. See 'protected/views/layouts/column2.php'.
+	 */
+	public $layout='//layouts/column2';
+
+	/**
+	 * @var CActiveRecord the currently loaded data model instance.
+	 */
+	private $_model;
+
+	/**
 	 * Lists all models.
 	 */
 	public function actionIndex()
@@ -13,16 +24,6 @@ class CategoryController extends Controller
 //		));
 		$this->render('index');
 	}
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
-	public $layout='//layouts/column2';
-
-	/**
-	 * @var CActiveRecord the currently loaded data model instance.
-	 */
-	private $_model;
 
 	/**
 	 * @return array action filters
@@ -47,7 +48,7 @@ class CategoryController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update','child'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -93,6 +94,29 @@ class CategoryController extends Controller
 			'model'=>$model,
 		));
 	}
+	/**
+	 * Creates a new child for current model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 */
+	public function actionChild($id)
+	{
+		$model=new Category;
+		$model->parent_id=$id;
+
+		// Uncomment the following line if AJAX validation is needed
+		// $this->performAjaxValidation($model);
+
+		if(isset($_POST['Category']))
+		{
+			$model->attributes=$_POST['Category'];
+			if($model->save())
+				$this->redirect(array('view','id'=>$model->id));
+		}
+
+		$this->render('child',array(
+			'model'=>$model,
+		));
+	}
 
 	/**
 	 * Updates a particular model.
@@ -103,7 +127,7 @@ class CategoryController extends Controller
 		$model=$this->loadModel();
 
 		// Uncomment the following line if AJAX validation is needed
-		 $this->performAjaxValidation($model);
+//		 $this->performAjaxValidation($model);
 
 		if(isset($_POST['Category']))
 		{
@@ -116,6 +140,16 @@ class CategoryController extends Controller
 			'model'=>$model,
 		));
 	}
+	private function findChildren($id, $objects){
+		static $children = array();
+		foreach ($objects as $obj){
+			if ($obj->parent_id == $id){
+				array_push($children, $obj);
+				$children =$this->findChildren($obj->id, $objects) + $children;
+			}
+		}
+		return $children;
+	}
 
 	/**
 	 * Deletes a particular model.
@@ -123,21 +157,21 @@ class CategoryController extends Controller
 	 */
 	public function actionDelete($id){
 
-		$categories =  Category::model()->findAll();
-		$categories_for_delete = [];
-		foreach ($categories as $category){
-			if ($category->id == $id || $category->parent_id == $id)
-				array_push($categories_for_delete, $category);
-		}
+		$categories =  Category::model()->findAll(array('select'=>'parent_id, id'));
+		//find all children for id
+		$categories_for_delete = $this->findChildren($id, $categories);
+//		foreach ($categories as $category){
+//			if ($category->id == $id || $category->parent_id == $id)
+//				array_push($categories_for_delete, $category);
+//		}
 //		$category = Category::model()->find($id);
 
 		if(Yii::app()->request->isPostRequest)
 		{
 			// we only allow deletion via POST request
-//			$this->loadModel()->delete();
 			foreach ($categories_for_delete as $category_for_delete)
 				$category_for_delete->delete();
-
+			$this->loadModel()->delete();
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
 				$this->redirect(array('index'));

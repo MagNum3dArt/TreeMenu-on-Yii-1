@@ -14,6 +14,9 @@ $this->menu=array(
 <?php
 //$this->widget('zii.widgets.MyCListView', array(
 $this->widget('TreeMenu', array(
+	'items'=>$this->menu,
+	'encodeLabel'=>false,
+
 //	'dataProvider'=>$dataProvider,
 //	'itemView'=>'_view',
 ));
